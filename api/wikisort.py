@@ -9,36 +9,31 @@ import flask
 from datetime import datetime
 
 def wordRelevance(topic):
-
-    page = wikipedia.page(topic,auto_suggest=True)
-
     startTime= datetime.now()
+    page = ""
+
+    topic = topic.lower()
 
     try:
-        page = wikipedia.page(topic)
+        page = wikipedia.page(topic, auto_suggest=True)
     except wikipedia.exceptions.PageError:
         return json.dumps(["Try " , "a more", "specific", "topic"])
+
     content = page.content
-    summary = page.summary
-    pagesummary = wikipedia.summary(topic, sentences=1).lower().split(" ")
-
-
-    the_keywords = keywords(content, scores = True)
-
-
-    not_topic= []
-    for each in the_keywords:
-        if(Levenshtein.ratio(each[0], topic.lower()) < .77):
-            not_topic.append(each)
-
-    the_keywords = not_topic
-
-#('skeptical', array([ 0.0271428]))
+    pagesummary = content[:content.index('.')].split(" ")
     links = page.links
+
+    the_keywords = keywords(content[:int(len(content)/2)], scores = True, ratio= .05)
+
+
+    delta = 0
+    for i in range(len(the_keywords)):
+        if(the_keywords[i + delta][0] == topic):
+            the_keywords.pop(i)
+            delta -= 1
 
     for i in range(0,len(links)):
         links[i] = links[i].lower()
-
 
     temp = []
 
@@ -71,6 +66,8 @@ def wordRelevance(topic):
         threshold = threshold - 0.05
 
 
+
+
     result = []
     ultimatelistofscores = listofscores[:4]
     for each in listofscores[:4]:
@@ -88,7 +85,6 @@ def wordRelevance(topic):
     top_five = {} #top 5 best matches
 
 
-
     count = 0
     for key, value in output.items():
         if(count < 5):
@@ -103,6 +99,7 @@ def wordRelevance(topic):
 
 
     endrank = {i : "" for i in range(4)}
+
 
 
     testing_links = []
@@ -125,15 +122,17 @@ def wordRelevance(topic):
 
     output = {i : 1 for i in testing_links}
 
-
+    #optimized
 
 
     storing_dic = {}
     count = 0;
 
     for each in testing_links:
-        storing_dic[each] = link_power(each) * (2 ** (-count) * .5 + 1) * output[each] #weights it according to relevance
+        storing_dic[each] = (2 ** (-count) * .5 + 1) * output[each] #weights it according to relevance
         count += 1
+
+
 
     sorted_dic = list(storing_dic.items())
 
@@ -144,26 +143,11 @@ def wordRelevance(topic):
     for each in sorted_dic[:4]:
         titles.append(str(each[0]))
 
+    print(datetime.now() - startTime)
+
+
     return titles
-
-
-
     #print links
-
-def link_power(topic):
-    headers = {'user-agent': "sdhacks-cyficowley@gmail.com"}
-    url = "https://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle={}&bllimit=5000&format=xml".format(topic)
-    totalLength = 0
-    for i in range(2):
-        html = requests.get(url, headers= headers).content
-        soup = BeautifulSoup(html, "lxml")
-        length = len(soup.findAll('bl'))
-        totalLength += length
-        if not length == 500:
-            break
-        url = "https://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle={}&bllimit=500&format=xml&blcontinue={}".format(topic, soup.find('continue')["blcontinue"])
-
-    return totalLength
 
 
 
