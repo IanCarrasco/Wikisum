@@ -23,7 +23,8 @@ def wordRelevance(topic):
     pagesummary = content[:content.index('.')]
 
     try:
-        pagesummary = pagesummary[:pagesummary.index('(')] + pagesummary[pagesummary.index(')') + 1:]
+        while(True):
+            pagesummary = pagesummary[:pagesummary.index('(')] + pagesummary[pagesummary.index(')') + 1:]
     except ValueError:
         pass
 

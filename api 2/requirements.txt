@@ -1,7 +1,0 @@
-flask_restful
-flask
-wikipedia
-gensim
-bs4
-requests
-python-levenshtein
