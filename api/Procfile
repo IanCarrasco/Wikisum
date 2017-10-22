@@ -1,1 +1,1 @@
-worker: python him.py
+web: python api.py
