@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 import Levenshtein
 import json
+import flask
 from datetime import datetime
 
 def wordRelevance(topic):
@@ -21,13 +22,9 @@ def wordRelevance(topic):
     summary = page.summary
     pagesummary = wikipedia.summary(topic, sentences=1).lower().split(" ")
 
-    print("1 {}".format(datetime.now()-startTime))
-    startTime= datetime.now()
 
     the_keywords = keywords(content, scores = True)
 
-    print("2 {}".format(datetime.now()-startTime))
-    startTime= datetime.now()
 
     not_topic= []
     for each in the_keywords:
@@ -56,14 +53,10 @@ def wordRelevance(topic):
         real_links[output_link.lower()] = each
 
 
-    print("3 {}".format(datetime.now()-startTime))
-    startTime= datetime.now()
-
     links = temp
 
     output = {}
 
-    wnl = WordNetLemmatizer()
     listofscores = []
     threshold = 1
     while (len(listofscores) < 5):
@@ -84,8 +77,6 @@ def wordRelevance(topic):
         result.append(each[0])
     output['0.99'] = result
 
-    print("4 {}".format(datetime.now()-startTime))
-    startTime= datetime.now()
 
     for each in the_keywords:
         for each2 in links:
@@ -151,24 +142,14 @@ def wordRelevance(topic):
 
     titles = []
     for each in sorted_dic[:4]:
-        titles.append(each[0])
+        titles.append(str(each[0]))
 
-
-    print("total time {}".format(datetime.now()-startTime))
-    startTime= datetime.now()
-
-
-    summaries("+".join(titles))
-
-    print("summary time {}".format(datetime.now()-startTime))
-
-    return json.dumps(titles)
+    return titles
 
 
 
     #print links
 
-    keys = keywords(content)
 def link_power(topic):
     headers = {'user-agent': "sdhacks-cyficowley@gmail.com"}
     url = "https://en.wikipedia.org/w/api.php?action=query&list=backlinks&bltitle={}&bllimit=5000&format=xml".format(topic)
@@ -184,17 +165,10 @@ def link_power(topic):
 
     return totalLength
 
-    #print summarize(content, word_count=100,ratio=0.1)
 
-    sLinks = []
 
-    #print keys
-    #print 'Links:'
-    #print links
-    for link in links:
-        if link in keys:
-            sLinks.append(link)
 def summaries(topics):
+    print(topics)
     topics = topics.split("+")
     summaries = []
     for topic in topics:
@@ -206,9 +180,7 @@ def summaries(topics):
             summaries.append("Sorry, this page was not found on wikipedia")
 
     #print sLinks
-
-    return summarize(content, word_count=100,ratio=0.1)
-    return json.dumps(summaries)
+    return summaries
 
 
 	# print(summarize(content, word_count = 100))
