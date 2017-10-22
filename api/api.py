@@ -1,8 +1,10 @@
 from flask_restful import Resource, Api
 from flask import Flask
+from flask_cors import CORS
 from wikisort import wordRelevance, summaries
 
 app = Flask(__name__)
+CORS(app, resources={r"/wiki/*": {"origins": "*"}})
 api = Api(app)
 
 class WikiTitle(Resource):
