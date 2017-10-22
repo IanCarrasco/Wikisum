@@ -20,7 +20,17 @@ def wordRelevance(topic):
         return json.dumps(["Try " , "a more", "specific", "topic"])
 
     content = page.content
-    pagesummary = content[:content.index('.')].split(" ")
+    pagesummary = content[:content.index('.')]
+
+    try:
+        pagesummary = pagesummary[:pagesummary.index('(')] + pagesummary[pagesummary.index(')') + 1:]
+    except ValueError:
+        pass
+
+    pagesummary = pagesummary.split()
+
+    print(pagesummary)
+
     links = page.links
 
     the_keywords = keywords(content[:int(len(content)/2)], scores = True, ratio= .05)
@@ -58,9 +68,8 @@ def wordRelevance(topic):
     while (len(listofscores) < 5):
         for each2 in links:
             for each in pagesummary:
-                if  each not in topic.lower() and each2 not in topic.lower():
+                if  each not in topic and each2 not in topic:
                     stringsimilarity = Levenshtein.ratio(each,each2)
-
                     if stringsimilarity >= threshold:
                         if each2 not in checker:
                             checker += [each2]
