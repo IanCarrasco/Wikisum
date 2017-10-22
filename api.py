@@ -1,6 +1,6 @@
 from flask_restful import Resource, Api
 from flask import Flask
-from wikisort import wordRelevance
+from wordRelevance import wordRelevance
 
 app = Flask(__name__)
 api = Api(app)
