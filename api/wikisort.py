@@ -50,23 +50,24 @@ def wordRelevance(topic):
 
     links = temp
 
-    output = {}
 
+    output = {}
+    checker = []
     listofscores = []
     threshold = 1
     while (len(listofscores) < 5):
         for each2 in links:
             for each in pagesummary:
-                if  each != topic.lower() and each2 != topic.lower():
+                if  each not in topic.lower() and each2 not in topic.lower():
                     stringsimilarity = Levenshtein.ratio(each,each2)
 
                     if stringsimilarity >= threshold:
-                        if [each2,stringsimilarity] not in listofscores:
+                        if each2 not in checker:
+                            checker += [each2]
                             listofscores += [[each2, stringsimilarity]]
-        threshold = threshold - 0.05
+        threshold = threshold - 0.1
 
-
-
+    listofscores.sort(key=lambda x: x[1], reverse=True)
 
     result = []
     ultimatelistofscores = listofscores[:4]
