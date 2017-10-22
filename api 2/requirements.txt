@@ -5,5 +5,3 @@ gensim
 bs4
 requests
 python-levenshtein
-gunicorn
-lxml
